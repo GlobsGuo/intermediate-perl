@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+
+#ex1
+#use Cwd;
+#use Cwd qw(abs_path);
+#
+#my @files = <*>;
+#foreach my $file (glob('* .*')) {
+#	say "    ".abs_path($file);
+#}
+
+#ex2
+use Module::CoreList;
+
+my @modules = keys $Module::CoreList::version{5.014002};
+
+foreach (@modules) {
+	printf "%-45s%-10s\n", $_, Module::CoreList->first_release($_) 
+		if defined $_;
+}
