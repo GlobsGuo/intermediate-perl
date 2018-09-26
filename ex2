@@ -12,11 +12,17 @@ use strict;
 #}
 
 #ex2
-use Module::CoreList;
+#use Module::CoreList;
+#
+#my @modules = keys $Module::CoreList::version{5.014002};
+#
+#foreach (@modules) {
+#	printf "%-45s%-10s\n", $_, Module::CoreList->first_release($_) 
+#		if defined $_;
+#}
 
-my @modules = keys $Module::CoreList::version{5.014002};
-
-foreach (@modules) {
-	printf "%-45s%-10s\n", $_, Module::CoreList->first_release($_) 
-		if defined $_;
-}
+use Business::ISBN;
+my $isbn13 = Business::ISBN->new('9781449393090');
+my $grp_code = $isbn13->group_code;
+my $pblsher_code = $isbn13->publisher_code;
+print "Group code is $grp_code, publisher code is $pblsher_code\n";
