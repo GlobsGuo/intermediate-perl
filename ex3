@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use v5.16;
+
+#ex1
+#my @files = <* .*>;
+#my @less1000byte = grep -s -f $_ < 1000, @files;
+#@less1000byte = map {
+#	substr($_, 0, 0) = "    ";
+#	$_ .= "\n";
+#	$_;
+#} @less1000byte;
+#
+#print foreach (@less1000byte);
+
+
+#ex2
+while (1) {
+	print "Input the regex to find files:";
+	chomp (my $pattern = <STDIN>);
+	last if $pattern eq "";
+	foreach (glob("* .*")) {
+		if (eval {/$pattern/}) {
+			say ;
+		}
+	}
+#	say grep { eval /$pattern/ } glob ('* .*');
+	print $@ if $@;
+}
+
+
+
+
