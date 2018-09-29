@@ -3,4 +3,39 @@ use v5.16;
 use strict;
 use diagnostics;
 
+#ex2
+my %sum;
+my $all = "all machines";
+while (<>) {
+	next if (/\A#/);
+	my ($src, $dst, $count) = split;
+	$sum{$src}{$dst} += $count;
+	$sum{$src}{$all} += $count;
+}
+
+my @srcs = sort { $sum{$b}{$all} <=> $sum{$a}{$all} } keys %sum;
+for my $src (@srcs) {
+	my $tb = $sum{$src};
+	my @dsts = sort { $tb->{$b} <=> $tb->{$a} } keys %$tb;
+	for my $dst (@dsts) {
+		my $format = "%s => %s: %d\n";
+		printf $format, $src, $dst, $sum{$src}{$dst};
+	}
+}
+
+#ex3
+#my %sum;
+#while (<>) {
+#	next if (/\A#/);
+#	my ($src, $dst, $count) = split;
+#	$sum{$src}{$dst} += $count;
+#}
+#
+#for my $src (sort keys %sum) {
+#	print "$src\n";
+#	for my $dst (sort keys %{$sum{$src}}) {
+#		my $format = "\t%s: %d\n";
+#		printf $format, $dst, $sum{$src}{$dst};
+#	}
+#}
 
