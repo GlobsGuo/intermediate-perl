@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+use diagnostics;
+
+use Storable;
+use JSON;
+
+#my $data_file = "total_bytes.data";
+my $data_file = "total_bytes.json";
+#my %sum;
+my $sum;
+my $all = "all machines";
+
+if (-e $data_file) {
+	local $/;
+	open my $fh, '<:raw', $data_file;
+	my $json_text = <$fh>;
+	$sum = decode_json($json_text);
+#	my $hash_ref = retrieve($data_file);
+#	%sum = %$hash_ref;
+}
+
+while (<>) {
+	next if (/\A#/);
+	my ($src, $dst, $count) = split;
+	$sum->{$src}{$dst} += $count;
+	$sum->{$src}{$all} += $count;
+#	$sum{$src}{$dst} += $count;
+#	$sum{$src}{$all} += $count;
+}
+
+#store \%sum, $data_file;
+open my $fh, '>:utf8', $data_file;
+print $fh to_json($sum, { pretty => 1});
+
+my @srcs = sort { $sum->{$b}{$all} <=> $sum->{$a}{$all} } keys %$sum;
+#my @srcs = sort { $sum{$b}{$all} <=> $sum{$a}{$all} } keys %sum;
+for my $src (@srcs) {
+	my $tb = $sum->{$src};
+#	my $tb = $sum{$src};
+	my @dsts = sort { $tb->{$b} <=> $tb->{$a} } keys %$tb;
+	for my $dst (@dsts) {
+		my $format = "%s => %s: %d\n";
+		printf $format, $src, $dst, $sum->{$src}{$dst};
+	#	printf $format, $src, $dst, $sum{$src}{$dst};
+	}
+}
