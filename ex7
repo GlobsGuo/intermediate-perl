@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+use File::Find;
+use Time::Local;
+
+my $target_dow = 4;
+my @starting_directories = (".");
+
+my $seconds_per_day = 24 * 60 * 60;
+my( $sec, $min, $hour, $day, $mon, $year, $dow ) = localtime;
+my $start = timelocal(0, 0, 0, $day, $mon, $year);
+while ($dow != $target_dow) {
+	$start -= $seconds_per_day;
+	if (--$dow < 0) {
+		$dow += 7;
+	}
+}
+my $stop = $start + $seconds_per_day;
+( $sec, $min, $hour, $day, $mon, $year, $dow ) = localtime($stop);
+print "$year:$mon:$day\n";
+
+my( $gather, $yield ) = gather_mtime_between($start, $stop);
+find($gather, @starting_directories);
+my @files = $yield->();
+
+for my $file (@files) {
+	my $mtime = (stat $file)[9];
+	my $when = localtime $mtime;
+	print "$when:$file\n";
+}
+
+sub gather_mtime_between {
+	my $start = shift;
+	my $stop = shift;
+	print "$start : $stop\n";
+	my @files = ();
+	#my $gather = sub { push @files if (-M) #-M is calculated in day# < $stop and (-M) > $start};
+	my $gather = sub {
+		my $ts = (stat $_)[9];
+		push @files, $File::Find::name 
+			if $ts < $stop and $ts >= $start;
+	};
+	my $yield = sub { @files }; 
+	( $gather, $yield);
+}
