@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+use diagnostics;
+
+use IO::Tee;
+print "Where do you want to output?\n";
+print "File, scalar, or both?\n";
+chomp(my $choice = <STDIN>);
+my $output;
+my $scalar;
+
+if ($choice =~ /file/i) {
+	open $output, '>', 'date';
+} elsif ($choice =~ /scalar/i) {
+	open $output, '>', \$scalar;
+} elsif ($choice =~ /both/i) {
+	open my $fh, '>', 'date';
+	open my $scalar_fh, '>', \$scalar;
+	$output = IO::Tee->new( $fh, $scalar_fh);
+} else {
+	print "Undefined choice!\n";
+}
+
+my $date = localtime;
+my $dow = (localtime)[6];
+print $output <<"HERE";
+This is run $$
+The date is $date
+The day of the week is $dow
+HERE
+
+print STDOUT <<"HERE" if $choice =~ m/^[st]/i;
+Scalar contains:
+$scalar
+HERE
