@@ -19,7 +19,7 @@ if ($choice =~ /file/i) {
 	open my $scalar_fh, '>', \$scalar;
 	$output = IO::Tee->new( $fh, $scalar_fh);
 } else {
-	print "Undefined choice!\n";
+	die "Undefined choice!\n";
 }
 
 my $date = localtime;
@@ -34,3 +34,5 @@ print STDOUT <<"HERE" if $choice =~ m/^[st]/i;
 Scalar contains:
 $scalar
 HERE
+
+print STDOUT "$scalar" if $choice =~ /scalar|both/i;
