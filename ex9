@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+use diagnostics;
+
+sub rightmost {
+	my( $string, @patterns ) = @_;
+	my $rightmost = -1;
+	while( my( $i, $pattern ) = each @patterns ) {
+		my $position = $string =~ m/$pattern/ ? $-[0] : -1;
+		$rightmost = $position if $position > $rightmost;
+	}
+	return $rightmost;
+}
+
+my %patterns = (
+	Gilligan	=>	qr/(?:Willie )?Gilligan/,
+	'Mary Ann'	=>	qr/Mary Ann/,
+	Ginger		=> 	qr/Ginger/,
+	Professor	=>	qr/(?:The )?Professor/,
+	Skipper		=>	qr/Skipper/,
+	'A Howell'	=>	qr/Mrs?. Howell/,
+);
+
+my $position = rightmost(
+	'There is Mrs. Howell, Ginger, and Gilligan',
+#	@patterns{ sort keys %patterns }
+	\%patterns
+);
+
+say "Rightmost match at position $position";
+
+foreach (@patterns{ sort keys %patterns }) {
+	say;
+}
