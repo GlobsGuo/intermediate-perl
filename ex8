@@ -3,36 +3,65 @@ use v5.16;
 use strict;
 use diagnostics;
 
-use IO::Tee;
-print "Where do you want to output?\n";
-print "File, scalar, or both?\n";
-chomp(my $choice = <STDIN>);
-my $output;
-my $scalar;
+#ex1
+#use IO::Tee;
+#print "Where do you want to output?\n";
+#print "File, scalar, or both?\n";
+#chomp(my $choice = <STDIN>);
+#my $output;
+#my $scalar;
+#
+#if ($choice =~ /file/i) {
+#	open $output, '>', 'date';
+#} elsif ($choice =~ /scalar/i) {
+#	open $output, '>', \$scalar;
+#} elsif ($choice =~ /both/i) {
+#	open my $fh, '>', 'date';
+#	open my $scalar_fh, '>', \$scalar;
+#	$output = IO::Tee->new( $fh, $scalar_fh);
+#} else {
+#	die "Undefined choice!\n";
+#}
+#
+#my $date = localtime;
+#my $dow = (localtime)[6];
+#print $output <<"HERE";
+#This is run $$
+#The date is $date
+#The day of the week is $dow
+#HERE
+#
+#print STDOUT <<"HERE" if $choice =~ m/^[st]/i;
+#Scalar contains:
+#$scalar
+#HERE
+#
+#print STDOUT "$scalar" if $choice =~ /scalar|both/i;
 
-if ($choice =~ /file/i) {
-	open $output, '>', 'date';
-} elsif ($choice =~ /scalar/i) {
-	open $output, '>', \$scalar;
-} elsif ($choice =~ /both/i) {
-	open my $fh, '>', 'date';
-	open my $scalar_fh, '>', \$scalar;
-	$output = IO::Tee->new( $fh, $scalar_fh);
-} else {
-	die "Undefined choice!\n";
+#ex2
+#while (<>) {
+#	state $fhs;
+##	(my $line = $_) =~ /((\D|\d)*):((\D|\d)*)/;
+#	(my $line = $_) =~ /^([^:]+):/;
+#	my $src = $1;
+#	unless ($fhs->{$src}) {
+#		open my $fh, '>>', $src 
+#			or die "Cannot create file $src";
+#		$fhs->{$src} = $fh;
+#	}
+#	print {$fhs->{$src}} $line;
+#}
+
+
+sub lsdir {
+	my $dh = shift;
+	foreach my $file (readdir($dh)) {
+		print "$file\n";
+	}
 }
 
-my $date = localtime;
-my $dow = (localtime)[6];
-print $output <<"HERE";
-This is run $$
-The date is $date
-The day of the week is $dow
-HERE
-
-print STDOUT <<"HERE" if $choice =~ m/^[st]/i;
-Scalar contains:
-$scalar
-HERE
-
-print STDOUT "$scalar" if $choice =~ /scalar|both/i;
+foreach (@ARGV) {
+	opendir my $dh, $_
+		or die "Cannot open directory:$!\n";
+	lsdir($dh);
+}
