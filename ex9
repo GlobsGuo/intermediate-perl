@@ -3,33 +3,54 @@ use v5.16;
 use strict;
 use diagnostics;
 
-sub rightmost {
-	my( $string, @patterns ) = @_;
-	my $rightmost = -1;
-	while( my( $i, $pattern ) = each @patterns ) {
-		my $position = $string =~ m/$pattern/ ? $-[0] : -1;
-		$rightmost = $position if $position > $rightmost;
-	}
-	return $rightmost;
+#ex1
+#sub rightmost {
+#	my( $string, $patterns ) = @_;
+#	my( $rightmost_position, $rightmost_key ) = ( -1, undef );
+#	while( my( $key, $pattern ) = each %$patterns ) {
+#		my $position = $string =~ m/$pattern/ ? $-[0] : -1;
+#		if( $position > $rightmost_position ) {
+#			$rightmost_position = $position;
+#			$rightmost_key = $key;
+#		}
+#	}
+#	return $rightmost_key;
+#}
+#
+#my %patterns = (
+#	Gilligan	=>	qr/(?:Willie )?Gilligan/,
+#	'Mary Ann'	=>	qr/Mary Ann/,
+#	Ginger		=> 	qr/Ginger/,
+#	Professor	=>	qr/(?:The )?Professor/,
+#	Skipper		=>	qr/Skipper/,
+#	'A Howell'	=>	qr/Mrs?. Howell/,
+#);
+#
+#my $position = rightmost(
+#	'There is Mrs. Howell, Ginger, and Gilligan',
+#	\%patterns
+#);
+#
+#say "Rightmost match key: $position";
+
+#ex2
+use Regexp::Assemble;
+#my @patterns = ();
+my $patterns = Regexp::Assemble->new;
+open my $fh, '<9.2-input.dat';
+while( <$fh> ) {
+	chomp (my $line = $_);
+#	push @patterns, qr/$line/;
+	$patterns->add("$line");
 }
 
-my %patterns = (
-	Gilligan	=>	qr/(?:Willie )?Gilligan/,
-	'Mary Ann'	=>	qr/Mary Ann/,
-	Ginger		=> 	qr/Ginger/,
-	Professor	=>	qr/(?:The )?Professor/,
-	Skipper		=>	qr/Skipper/,
-	'A Howell'	=>	qr/Mrs?. Howell/,
-);
-
-my $position = rightmost(
-	'There is Mrs. Howell, Ginger, and Gilligan',
-#	@patterns{ sort keys %patterns }
-	\%patterns
-);
-
-say "Rightmost match at position $position";
-
-foreach (@patterns{ sort keys %patterns }) {
-	say;
+say "Please input the lines:";
+while( <> ) {
+#	foreach my $pattern (@patterns) {
+#		print "Match at line $. | $_" if /$pattern/;
+#	}
+	print "Match at line $. | $_" if /$patterns/;
 }
+
+
+
