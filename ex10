@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use v5.16;
+use strict;
+use diagnostics;
+
+#ex1,2
+#use Benchmark qw(:all);
+#chdir;
+#my @files = glob('*');
+#sub schwatzian_transform {
+#	my @sorted = 
+#		map $_->{NAME},
+#		sort {
+#			$a->{SIZE} <=> $b->{SIZE}
+#		}
+#		map {
+#			NAME	=>	$_,
+#			SIZE	=>	-s $_,
+#		},
+#		@files;
+#};
+#sub glob_operation {
+#	my @sorted = sort { -s $a <=> -s $b } @files;
+#};
+#timethese( -2, {
+#	'sub1'	=>	\&schwatzian_transform, 
+#	'sub2'	=>	\&glob_operation
+#	}
+#);
+
+my ( @inputs, @words ) = ( (), () );
+while ( <> ) {
+	chomp;
+	push @inputs, $_;
+	tr/A-Z/a-z/;
+	tr/a-z//cd;
+	push @words, $_;
+}
+my @sorted_index = 
+	sort { $words[$a] cmp $words[$b] } 0 .. $#words;
+foreach my $index (@sorted_index) {
+	say $inputs[$index];
+}
+
+my @sorted = 
+	map $_->[0], 
+	sort { $a->[1] cmp $b->[1] }
+	map {
+		my $string = $_;
+		$string =~ tr/A-Z/a-z/;
+		$string =~ tr/a-z//cd;
+		[ $_, $string ];
+	} @inputs;
+say @sorted;
