@@ -28,27 +28,98 @@ use diagnostics;
 #	}
 #);
 
-my ( @inputs, @words ) = ( (), () );
-while ( <> ) {
-	chomp;
-	push @inputs, $_;
-	tr/A-Z/a-z/;
-	tr/a-z//cd;
-	push @words, $_;
-}
-my @sorted_index = 
-	sort { $words[$a] cmp $words[$b] } 0 .. $#words;
-foreach my $index (@sorted_index) {
-	say $inputs[$index];
+#ex3
+#my ( @inputs, @words ) = ( (), () );
+#while ( <> ) {
+#	chomp;
+#	push @inputs, $_;
+#	tr/A-Z/a-z/;
+#	tr/a-z//cd;
+#	push @words, $_;
+#}
+#my @sorted_index = 
+#	sort { $words[$a] cmp $words[$b] } 0 .. $#words;
+#foreach my $index (@sorted_index) {
+#	say $inputs[$index];
+#}
+#
+#my @sorted = 
+#	map $_->[0], 
+#	sort { $a->[1] cmp $b->[1] }
+#	map {
+#		my $string = $_;
+#		$string =~ tr/A-Z/a-z/;
+#		$string =~ tr/a-z//cd;
+#		[ $_, $string ];
+#	} @inputs;
+#say @sorted;
+
+
+use File::Basename;
+use Data::Dumper;
+use File::Spec::Functions;
+
+sub dump_path {
+	my( $path, $threshold, $data ) = @_;
+	my @queue = ([ $path, 0, $data ]);
+	while( my $next = shift @queue ) {
+		my( $path, $level, $ref ) = @$next;
+		my $basename = basename($path);
+		print ' ' x $level, $basename;
+		$ref->{$basename} = do {
+			if (-f $path or -l $path) { undef }
+			else {
+				my $hash = {};
+				if ($level < $threshold) {
+					opendir my $dh, $path;
+					my @new_paths = map {
+						catfile($path, $_)
+					} grep { ! /^\.\.?\z/ } readdir $dh;
+
+					push @queue, map { [$_, $level+1, $hash] } @new_paths;
+				}
+				$hash;
+			}	
+		};
+		
+	}
+	$data;
 }
 
-my @sorted = 
-	map $_->[0], 
-	sort { $a->[1] cmp $b->[1] }
-	map {
-		my $string = $_;
-		$string =~ tr/A-Z/a-z/;
-		$string =~ tr/a-z//cd;
-		[ $_, $string ];
-	} @inputs;
-say @sorted;
+sub dump_path_recursively {
+	my $path = shift;
+	my $data = shift;
+	my $level = shift || 0;
+	print ' ' x $level, $path;
+
+	if( not defined $data ) {
+		print "\n";
+		return;
+	}
+	if( keys %$data ) {
+		print ", with contents of:\n";
+		foreach (sort keys %$data) {
+			dump_path_recursively( $_, $data->{$_}, $level+1 );
+		} 	
+	} else {
+		print ", an empty directory\n";
+	}
+
+	if (-f $path or -l $path) {
+		return undef;
+	}
+	if (-d $path) {
+		my %directory;
+		opendir PATH, $path or die "Cannot opendir $path:$!";
+		my @names = readdir PATH;
+		closedir PATH;
+		for my $name (@names) {
+			next if $name eq '.' or $name eq '..';
+			$directory{$name} = dump_path_recursively("$path/$name");
+		}
+		return \%directory;
+	}
+	return undef;
+}
+dump_path_recursively("/home/john/Documents/intermediate_perl", my $contents, 2);
+
