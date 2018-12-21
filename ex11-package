@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+# ex1
+#package MonthName;
+#use v5.16;
+#use strict;
+#use diagnostics;
+#
+#our @day = qw(ark dip wap sen pop sep kir);
+#sub number_to_day_name { 
+#	my $num = shift @_; 
+#	if ($num =~ /\D/) { die "don't input alphabet"; } 
+#	if ($num < 0 or $num > 6) { die "input numbers between 1 and 7"; }
+#	$day[$num]; 
+#}
+#our @month = qw(diz pod bod rod sip wax lin sen kun fiz nap dep);
+#sub number_to_month_name { 
+#	my $num = shift @_; 	
+#	if ($num =~ /\D/) { die "don't input alphabet"; } 
+#	if ($num < 0 or $num > 11) { die "input numbers between 1 and 12"; }
+#	$month[$num]; 
+#}
+#
+#1;
+
+
+use v5.16;
+use strict;
+use diagnostics;
+require 'MonthName.pm';
+
+my ($sec, $min, $hour, $mday, $mon, $year, $wday) = localtime;
+my $month = MonthName::number_to_month_name($mon);
+my $day = MonthName::number_to_day_name($wday);
+say "Today is $day $month ".($year+1900);
